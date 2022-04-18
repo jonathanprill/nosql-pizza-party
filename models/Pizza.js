@@ -1,21 +1,46 @@
 const { Schema, model } = require('mongoose');
+//imports the date getter function
+const dateFormat = require('../utils/dateFormat');
 
-const PizzaSchema = new Schema({
-    pizzaName: {
-        type: String
+const PizzaSchema = new Schema(
+    {
+        pizzaName: {
+            type: String
+        },
+        createdBy: {
+            type: String
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+            //getters transform the data every time it's queried, like middleware
+            get: (createdAtVal) => dateFormat(createdAtVal)
+        },
+        size: {
+            type: String,
+            default: 'Large'
+        },
+        toppings: [],
+        // In Mongoose, we instruct the parent to keep track of its children
+        comments: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Comment'
+            }
+        ]
     },
-    createdBy: {
-        type: String
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    size: {
-        type: String,
-        default: 'Large'
-    },
-    toppings: []
+    {
+        toJSON: {
+            virtuals: true,
+            getters: true
+        },
+        id: false
+    }
+);
+
+// get total count of comments and replies on retrieval
+PizzaSchema.virtual('commentCount').get(function () {
+    return this.comments.length;
 });
 
 //Creates the Pizza Model using PizzaSchema

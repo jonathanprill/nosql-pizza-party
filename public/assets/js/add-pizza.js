@@ -68,6 +68,8 @@ const handlePizzaSubmit = event => {
     })
     .catch(err => {
       console.log(err);
+      //Using IndexDB
+      saveRecord(formData);
     });
 };
 
